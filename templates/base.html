@@ -1,0 +1,45 @@
+{% load staticfiles %}
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <title>Analytics Channelsr</title>
+
+  {% block style %}
+  <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+  {% endblock %}
+</head>
+<body>
+  <div class="container">
+    <br>
+    {% block content %}{% endblock content %}
+  </div>
+  <div id="logs" class="container">
+    <br>
+    <textarea readonly style="width: 300px; height: 150px;">LOG:</textarea>
+  </div>
+
+
+  {% block script %}
+  <script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="{% static 'channels/js/websocketbridge.js' %}"></script>
+
+  <script>
+    const webSocketBridge = new channels.WebSocketBridge();
+    webSocketBridge.connect('/log/');
+    webSocketBridge.listen(function(action, stream) {
+      // console.log(action);
+      $('textarea').append(action + '\n');
+    });
+    webSocketBridge.socket.addEventListener('open', function() {
+      console.log("Connected to log");
+    });
+  </script>
+
+  {% endblock script %}
+
+</body>
+</html>

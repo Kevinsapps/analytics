@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <p>Home content</p>
+
+  <p>Events count: <i id="events-count"></i></p>
+
+  <button class="btn">Button here</button>
+
+  <button class="btn">Another button</button>
+
+  <button class="btn">Wow and another one!</button>
+
+
+{% endblock content %}
+
+{% block script %}
+  {{ block.super }}
+
+  <script>
+
+    const events = "blur focus focusin focusout load resize scroll unload click " +
+      "dblclick mousedown mouseup mousemove mouseover mouseout mouseenter " +
+       "mouseleave change select submit keydown keypress keyup error";
+
+    // const events = 'click';
+
+    const eventsBridge = new channels.WebSocketBridge();
+    eventsBridge.connect('/events/');
+    eventsBridge.listen(function(action, stream) {
+      // log number of events, and when last updated.
+      // console.log(action);
+      if (action['count']) {
+        $('#events-count').html(action['count'])
+      }
+    });
+    eventsBridge.socket.addEventListener('open', function() {
+      console.log("Connected to events");
+    });
+
+    $('button').on(events, function(e) {
+      var mini_event = {
+        currentTarget: e.currentTarget,
+        type: e.type,
+        timeStamp: e.timeStamp,
+        clientX: e.clientX,
+        clientY: e.clientY
+      };
+
+      eventsBridge.send(mini_event);
+
+    });
+  </script>
+
+{% endblock script %}
+
+
+
+<!--
+e.currentTarget
+e.type
+e.timestamp
+e.clientX
+e.clientY
+
+-->
