@@ -90,6 +90,13 @@ TEMPLATES = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser',
+    ),
+}
+
+
 WSGI_APPLICATION = 'analytics.wsgi.application'
 
 

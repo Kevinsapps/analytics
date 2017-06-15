@@ -2,6 +2,7 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 
 from channels.generic.websockets import JsonWebsocketConsumer
 
+from events.models import Event
 from events.serializers import EventSerializer
 
 
@@ -15,6 +16,9 @@ class LogConsumer(JsonWebsocketConsumer):
         return ['log']
 
     def connect(self, message, **kwargs):
+        # Reply with accept: True for protocol reasons.
+        super(LogConsumer, self).connect(message, **kwargs)
+
         self.group_send('log', 'hello {}'.format(message.user))
 
     def receive(self, content, **kwargs):
@@ -31,8 +35,6 @@ class EventConsumer(JsonWebsocketConsumer):
         return ['events']
 
     def receive(self, content, **kwargs):
-        self.send('Data received')
-
         data = {
             'event': content,
             'user': self.message.user.pk
@@ -41,6 +43,7 @@ class EventConsumer(JsonWebsocketConsumer):
         serializer = EventSerializer(data=data)
         if serializer.is_valid():
             event = serializer.save()
-            self.group_send('events', {'count': intcomma(event.pk)})
+            count = Event.objects.count()  # @TODO YIKES SLOW!! Look into caching this or something?
+            self.group_send('events', {'count': intcomma(count)})
         else:
             self.send(serializer.errors)

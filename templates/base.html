@@ -6,21 +6,41 @@
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-  <title>Analytics Channelsr</title>
+  <title>Websocket Analytics</title>
 
   {% block style %}
   <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
   {% endblock %}
 </head>
+
 <body>
+  <header>
+    <div class="container">
+      <div class="row">
+        <p>Here's my header right here.</p>
+      </div>
+    </div>
+  </header>
+
   <div class="container">
-    <br>
     {% block content %}{% endblock content %}
   </div>
-  <div id="logs" class="container">
-    <br>
-    <textarea readonly style="width: 300px; height: 150px;">LOG:</textarea>
-  </div>
+
+  <footer>
+    <div id="logs" class="container">
+      <div class="row">
+        <div class="col-sm-4">
+          <textarea readonly class="form-control" rows="3">LOG:</textarea>
+        </div>
+        <div class="col-sm-4">
+          <p>Some text here</p>
+        </div>
+        <div class="col-sm-4">
+          <p>Some more text right over here.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
 
 
   {% block script %}
@@ -32,7 +52,7 @@
     webSocketBridge.connect('/log/');
     webSocketBridge.listen(function(action, stream) {
       // console.log(action);
-      $('textarea').append(action + '\n');
+      $('textarea').prepend(action + '\n');
     });
     webSocketBridge.socket.addEventListener('open', function() {
       console.log("Connected to log");
