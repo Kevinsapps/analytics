@@ -2,11 +2,13 @@
 
 ### Goal:
 
-Create a really analytics platform which communicates to the main server VIA web socket on events.
+Create a real time analytics platform which communicates to the main server VIA web socket on events.
 
 Data is then aggregated and displayed VIA REST API in the dashboard.
 
 Goals include testing the limitations of websockets sending large numbers of requests, and potential issues with database writes.
+
+Each websocket write is about 2000 characters, and there can be upwards of 20 events/user/second.
 
 
 ### Install/Setup:
@@ -22,5 +24,5 @@ Make sure to add a Social application for Reddit in the admin if Reddit login is
 
 ### Testing:
 
-python manage.py test
+`python manage.py test`
 

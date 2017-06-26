@@ -11,9 +11,19 @@
     <button class="btn">Wow and another one!</button>
   </div>
 
+  <div class="row" id="charts-header">
+    <div class="col-sm-6 col-sm-offset-4">
+      <h3 class="text-center">Charts go here. Note that you must be <a href="{% url 'account_login' %}">Logged in </a> To view them</h3>
+      <ul class="text-center" id="charts-header-messages"></ul>
+    </div>
+  </div>
+
   <div class="row" id="charts">
-    <div class="col-sm-4">
-      <canvas id="users" width="200" height="200"><div class="chart-loading">Chart is loading</div></canvas>
+    <div class="col-sm-4" hidden="hidden">
+      <canvas id="users"></canvas>
+    </div>
+    <div class="col-sm-8" hidden="hidden">
+      <canvas id="events"></canvas>
     </div>
   </div>
 
@@ -89,16 +99,21 @@
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            title:{
+                  display: true,
+                  text: 'Top users with most events'
+              }
         }
     };
 
-    var ctx = $('#charts #users');
-    var top_users_chart = new Chart(ctx, top_users_data);
+    var top_users_ctx = $('#charts #users');
+    var top_users_chart = new Chart(top_users_ctx, top_users_data);
 
     $(document).ready(function() {
       $.get('/v1/events/top_users/')
         .done(function(data) {
+          top_users_ctx.parent().show();
           var labels = [];
           var counts = [];
 
@@ -115,7 +130,100 @@
 
         })
         .fail(function(xhr, status, error) {
-          console.log(['Could not get chart data', status, error]);
+          status = xhr.status;
+          $('#charts-header-messages').append('<li>' + status + ' You must log in to view the top users</li>');
+        });
+
+    });
+
+  </script>
+
+  <script>
+    // Top events charting
+    var top_events_data = {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Global',
+                data: [],
+                backgroundColor:  'rgba(255,99,132,0.5)',
+                borderColor: 'rgba(255,99,132,1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Mine',
+                data: [],
+                backgroundColor:  'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            title:{
+                  display: true,
+                  text: 'Top events'
+            },
+            scales: {
+                xAxes: [{
+                    display: true
+                }],
+                yAxes: [{
+                    display: true,
+                    type: 'logarithmic',
+                }]
+            }
+        }
+    };
+
+    var top_events_ctx = $('#charts #events');
+    var top_eventss_chart = new Chart(top_events_ctx, top_events_data);
+
+    $(document).ready(function() {
+      $.get('/v1/events/top_events/')
+        .done(function(data) {
+          top_events_ctx.parent().show();
+          var events = [];
+          var counts = [];
+
+          var event_data = data['results'];
+          event_data.forEach(function(event) {
+            events.push(event.event);
+            counts.push(event.count);
+          });
+
+          top_eventss_chart.data.labels = events;
+          top_eventss_chart.data.datasets[0].data = counts;
+
+          top_eventss_chart.update();
+
+        })
+        .fail(function(xhr, status, error) {
+          status = xhr.status;
+          $('#charts-header-messages').append('<li>' + status + ' You must log in to view the top events</li>');
+        });
+
+      $.get('/v1/events/top_events/?me')
+        .done(function(data) {
+          top_events_ctx.parent().show();
+          var events = [];
+          var counts = [];
+
+          var event_data = data['results'];
+          event_data.forEach(function(event) {
+            events.push(event.event);
+            counts.push(event.count);
+          });
+
+          top_eventss_chart.data.datasets[1].data = counts;
+
+          top_eventss_chart.update();
+
+        })
+        .fail(function(xhr, status, error) {
+          status = xhr.status;
+          $('#charts-header-messages').append('<li>' + status + ' You must log in to view your top events</li>');
         });
 
     });

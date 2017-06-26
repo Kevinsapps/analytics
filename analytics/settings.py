@@ -130,14 +130,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'reddit': {
-#         'AUTH_PARAMS': {'duration': 'permanent'},
-#         'SCOPE': ['identity', 'submit'],
-#         'USER_AGENT': 'django:myappid:1.0 (by /u/yourredditname)',
-#     }
-# }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

@@ -12,3 +12,8 @@ footer {
 #charts {
     margin-top: 25px;
 }
+
+
+#chars canvas {
+    max-height: 400px;
+}

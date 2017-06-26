@@ -33,11 +33,12 @@ class TopUsersView(APIView):
         """
         kwargs['max_users'] optional (default: 5) - the max number of users to return.
         """
-        limit = kwargs.get('max_users', 5)
-        if not type(limit) == int:
+        try:
+            limit = int(request.query_params.get('max_users', 5))
+        except ValueError:
             return Response({'message': 'max_users must be an integer.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        users = Event.objects.values('user__username').annotate(Count("id")).order_by()[:limit]
+        users = Event.objects.values('user__username').annotate(Count("id")).order_by()[:limit - 1]
         num_users = len(users) + 1  # Note we need to +1 this due to the other user who is always around
 
         events_count = Event.objects.count()
@@ -67,10 +68,21 @@ class TopEventsView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
+        """
+        kwargs['user'] optional (default None) - username to look up.
+        kwargs['me'] optional (default None) - Shortcut to get just the user's events.
+        """
+        if 'me' in request.query_params:
+            qs = Event.objects.filter(user=request.user)
+        elif request.query_params.get('user'):
+            qs = Event.objects.filter(user__username=request.query_params.get('user'))
+        else:
+            qs = Event.objects.all()
+
         # The superquery: SELECT ••• FROM "events_event" GROUP BY (((event->>'type')::text))
         # Unfortunately django 1.11  doesn't support values('jsonfield__value') yet.
-        events = Event.objects.annotate(event_type=RawSQL("((event->>%s)::text)", ('type',))
-                               ).values('event_type').annotate(Count("event_type")).order_by()
+        events = qs.annotate(event_type=RawSQL("((event->>%s)::text)", ('type',))
+                               ).values('event_type').annotate(Count("event_type")).order_by('-event_type__count')
 
         data = {
             'count': len(events),
