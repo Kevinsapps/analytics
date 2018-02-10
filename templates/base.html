@@ -17,7 +17,16 @@
   <header>
     <div class="container">
       <div class="row">
-        <p>Here's my header right here.</p>
+        <div class="col-xs-6">
+          <p>Websocket based analytics</p>
+        </div>
+        <div class="col-xs-4 col-xs-offset-2">
+          {% if user.is_authenticated %}
+            <p>Hello, {{ user.username }}, <a href="{% url 'account_logout' %}">Logout</a></p>
+          {% else %}
+            <p><a href="{% url 'account_login' %}">Login or register.</a></p>
+          {% endif %}
+        </div>
       </div>
     </div>
   </header>
@@ -32,11 +41,8 @@
         <div class="col-sm-4">
           <textarea readonly class="form-control" rows="3">LOG:</textarea>
         </div>
-        <div class="col-sm-4">
-          <p>Some text here</p>
-        </div>
-        <div class="col-sm-4">
-          <p>Some more text right over here.</p>
+        <div class="col-sm-4 col-sm-offset-4">
+          <p>Github <a href="https://github.com/Kevinsapps/analytics">Source</a></p>
         </div>
       </div>
     </div>

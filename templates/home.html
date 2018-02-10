@@ -4,16 +4,18 @@
   <div class="row" id="buttons">
     <p>Events count: <i id="events-count"></i></p>
 
-    <button class="btn">Button here</button>
+    <button class="btn btn-lg btn-primary">Click me</button>
 
-    <button class="btn">Another button</button>
+    <button class="btn btn-lg btn-warning">Mouse over me</button>
 
-    <button class="btn">Wow and another one!</button>
+    <button class="btn btn-lg btn-default">Do any event on me</button>
   </div>
 
   <div class="row" id="charts-header">
     <div class="col-sm-6 col-sm-offset-4">
-      <h3 class="text-center">Charts go here. Note that you must be <a href="{% url 'account_login' %}">Logged in </a> To view them</h3>
+      <h3 class="text-center">
+        Charts go here.
+        {% if not user.is_authenticated %}Note that you must be <a href="{% url 'account_login' %}">Logged in </a> To access the charts API</h3>{% endif %}
       <ul class="text-center" id="charts-header-messages"></ul>
     </div>
   </div>
